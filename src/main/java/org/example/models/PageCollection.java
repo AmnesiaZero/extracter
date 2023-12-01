@@ -4,9 +4,8 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
-public class Document {
+public class PageCollection {
     private List<Page> pages;
-    public Response response;
     public List<Page> getPages() {
         return pages;
     }
@@ -16,7 +15,7 @@ public class Document {
     }
 
 
-    public Document(List<Page> pages) {
+    public PageCollection(List<Page> pages) {
         this.pages = pages;
     }
 
