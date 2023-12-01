@@ -5,7 +5,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.example.DAO.DataSource;
+import org.example.DAO.PageDAO;
 import org.example.models.Page;
+import org.example.models.PageCollection;
 import org.example.models.Response;
 
 import java.io.File;
@@ -14,8 +17,10 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ResponseController {
+    Response response;
+
     public String request() {
-        String response = "";
+        String json = "";
         try {
             String sourceDir = "D:\\docs\\98\\145639844398.pdf";
             String destinationDir = "D:\\docs\\output\\";
@@ -55,8 +60,11 @@ public class ResponseController {
                         pages.add(new Page(i, content));
                         i++;
                     }
-                    response = success("Страницы успешно извлечены",fileName,pages,errors);
                     FileUtils.cleanDirectory(new File("D:\\docs\\output"));
+                    response = new Response(true,"Страницы успешно извлечены",fileName,pages,errors);
+                    PageCollection pageCollection =  new PageCollection(pages);
+                    pageCollection.store();
+                    json = success("Страницы успешно извлечены",fileName,pages,errors);
                 } else {
                     return error("Файл " + fileName + " пустой");
                 }
@@ -66,7 +74,8 @@ public class ResponseController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return response;
+
+        return json;
     }
     public String error(String message)
     {

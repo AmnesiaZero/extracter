@@ -2,27 +2,37 @@ package org.example.models;
 
 public class Page {
 
-    private int pageNumber;
-    private String pageText;
+    private int number;
+    private String text;
 
-    public int getPageNumber() {
-        return pageNumber;
+    public String getTitle() {
+        return title;
     }
 
-    public void setPageNumber(int pageNumber) {
-        this.pageNumber = pageNumber;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getPageText() {
-        return pageText;
+    private String title;
+
+    public int getNumber() {
+        return number;
     }
 
-    public void setPageText(String pageText) {
-        this.pageText = pageText;
+    public void setNumber(int number) {
+        this.number = number;
     }
 
-    public Page(int pageNumber,String pageText) {
-        this.pageNumber = pageNumber;
-        this.pageText = pageText;
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public Page(int number, String pageText) {
+        this.number = number;
+        this.text = pageText;
     }
 }
