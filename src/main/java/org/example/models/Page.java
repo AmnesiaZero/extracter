@@ -2,18 +2,11 @@ package org.example.models;
 
 public class Page {
 
+
+    private int bookId;
+
     private int number;
-    private String text;
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    private String title;
+    private String content;
 
     public int getNumber() {
         return number;
@@ -23,16 +16,25 @@ public class Page {
         this.number = number;
     }
 
-    public String getText() {
-        return text;
+    public String getContent() {
+        return content;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setContent(String content) {
+        this.content = content;
+    }
+    public int getBookId() {
+        return bookId;
     }
 
-    public Page(int number, String pageText) {
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
+    }
+
+    public Page(int bookId, int number, String pageText) {
+        this.bookId = bookId;
         this.number = number;
-        this.text = pageText;
+        this.content = pageText;
     }
+
 }

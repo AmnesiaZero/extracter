@@ -11,13 +11,12 @@ public class PageDAO {
         this.dataSource = dataSource;
     }
 
-    public boolean create(Page page) throws SQLException {
-        PreparedStatement preparedStatement= dataSource.connection.prepareStatement("INSERT INTO `pages`(`id`,`title`,`number`,`text`) VALUES(NULL,?,?,?)");
-        preparedStatement.setInt(1,page.getNumber());
-        preparedStatement.setString(2,page.getTitle());
-        preparedStatement.setString(3,page.getText());
+    public void create(Page page) throws SQLException {
+        PreparedStatement preparedStatement= dataSource.connection.prepareStatement("INSERT INTO `book_content`(`book_id`,`page_id`,`content`) VALUES(?,?,?)");
+        preparedStatement.setInt(1,page.getBookId());
+        preparedStatement.setInt(2,page.getNumber());
+        preparedStatement.setString(3,page.getContent());
         preparedStatement.execute();
-        return true;
 
     }
 }
