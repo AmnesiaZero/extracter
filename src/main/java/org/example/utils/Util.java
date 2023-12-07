@@ -14,8 +14,7 @@ public class Util {
                 .collect(Collectors.toSet());
     }
 
-    public static String clearString(String str)
-    {
+    public static String clearString(String str) {
         return str.replaceAll("[\\r\\n\\\\\\\\/]+", " ");
     }
 }

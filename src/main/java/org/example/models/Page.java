@@ -8,6 +8,12 @@ public class Page {
     private int number;
     private String content;
 
+    public Page(int bookId, int number, String pageText) {
+        this.bookId = bookId;
+        this.number = number;
+        this.content = pageText;
+    }
+
     public int getNumber() {
         return number;
     }
@@ -23,18 +29,13 @@ public class Page {
     public void setContent(String content) {
         this.content = content;
     }
+
     public int getBookId() {
         return bookId;
     }
 
     public void setBookId(int bookId) {
         this.bookId = bookId;
-    }
-
-    public Page(int bookId, int number, String pageText) {
-        this.bookId = bookId;
-        this.number = number;
-        this.content = pageText;
     }
 
 }

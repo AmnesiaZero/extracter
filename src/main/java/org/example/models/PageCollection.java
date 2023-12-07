@@ -10,18 +10,18 @@ import java.util.List;
 public class PageCollection {
     private List<Page> pages;
     private PageDAO pageDAO;
+
+    public PageCollection(List<Page> pages) throws Exception {
+        this.pages = pages;
+        this.pageDAO = new PageDAO(new DataSource());
+    }
+
     public List<Page> getPages() {
         return pages;
     }
 
     public void setPages(List<Page> pages) {
         this.pages = pages;
-    }
-
-
-    public PageCollection(List<Page> pages) throws Exception {
-        this.pages = pages;
-        this.pageDAO = new PageDAO(new DataSource());
     }
 
     // геттеры и сеттеры
@@ -33,7 +33,7 @@ public class PageCollection {
 
     public void store() throws SQLException {
 
-        for (Page page:pages) {
+        for (Page page : pages) {
             pageDAO.create(page);
         }
     }
