@@ -14,16 +14,9 @@ public class DataSource {
     static String password;
     public Connection connection;
     public DataSource() throws Exception {
-        try(InputStream inputStream = getClass().getClassLoader().getResourceAsStream("./sql.properties")) {
-            Properties properties = new Properties();
-            properties.load(inputStream);
-            url = properties.getProperty("sql.url");
-            username = properties.getProperty("sql.username");
-            password = properties.getProperty("sql.password");
-        }
-        catch (IOException e){
-            throw new Exception(e);
-        }
+        url = "jdbc:mysql://5.188.136.155:2230/vkr-smart-db1-pile";
+        username = "vkr-smart-db1-parser";
+        password = "A2xBaAMNESIAjKTSN";
         connection =  DriverManager.getConnection(url,username,password);
     }
 }
