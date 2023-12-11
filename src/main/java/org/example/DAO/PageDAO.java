@@ -3,7 +3,9 @@ package org.example.DAO;
 import org.example.models.Page;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class PageDAO {
     public DataSource dataSource;
@@ -21,8 +23,8 @@ public class PageDAO {
     }
 
     public int getLastBook() throws SQLException {
-
-        PreparedStatement preparedStatement = dataSource.connection.prepareStatement("SELECT MAX(book_id) FROM `book_content` LIMIT 1");
-        return SqlConverter.executeInt(preparedStatement, "book_id");
+        Statement statement = dataSource.connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT MAX(`book_id`) FROM `book_content`");
+        return SqlConverter.executeInt(resultSet);
     }
 }

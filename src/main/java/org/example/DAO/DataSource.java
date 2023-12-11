@@ -14,6 +14,9 @@ public class DataSource {
         url = "jdbc:mysql://5.188.136.155:2230/vkr-smart-db1-pile";
         username = "vkr-smart-db1-parser";
         password = "A2xBaAMNESIAjKTSN";
+//        url = "jdbc:mysql://localhost/api_search";
+//        username = "root";
+//        password = "root";
         connection = DriverManager.getConnection(url, username, password);
     }
 }

@@ -1,6 +1,5 @@
 package org.example.DAO;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,10 +30,11 @@ public class SqlConverter {
         return hashMap;
     }
 
-    public static int executeInt(PreparedStatement preparedStatement, String label) throws SQLException {
-        ResultSet resultSet = preparedStatement.executeQuery();
-        resultSet.next();
-        return resultSet.getInt(label);
+    public static int executeInt(ResultSet resultSet) throws SQLException {
+        if (!resultSet.next()) {
+            return 0;
+        }
+        return resultSet.getInt(1);
     }
 
     public static char convertSqlToChar(ResultSet resultSet, String label) throws SQLException {
