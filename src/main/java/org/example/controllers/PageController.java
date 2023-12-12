@@ -6,18 +6,16 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.example.DAO.DataSource;
 import org.example.DAO.PageDAO;
 import org.example.models.Page;
-import org.example.models.PageCollection;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Stream;
 
 
 public class PageController {
+    public int pageNumber;
     PageDAO pageDAO;
 
     public PageController() throws Exception {
@@ -68,30 +66,31 @@ public class PageController {
     }
 
     public void loadFile(Path filePath) {
+        pageNumber = 1;
         try (PDDocument document = PDDocument.load(filePath.toFile())) {
             String fileName = filePath.getFileName().toString().replace(".pdf", "");
             int totalPages = document.getNumberOfPages();
             if (totalPages > 0) {
                 Splitter splitter = new Splitter();
-                List<PDDocument> pages = splitter.split(document);
-                List<Page> newPages = new ArrayList<>();
-                int i = 1;
-                for (PDDocument pdf : pages) {
-                    PDFTextStripper stripper = new PDFTextStripper();
-                    String text = stripper.getText(pdf);
-                    if (text.isEmpty()) {
-                        continue;
+                splitter.split(document).forEach(pdf -> {
+                    try {
+                        PDFTextStripper stripper = new PDFTextStripper();
+                        String text = stripper.getText(pdf);
+                        String normalizedText = Normalizer.normalize(text, Normalizer.Form.NFKC)
+                                .replaceAll("\\p{InCombiningDiacriticalMarks}+", " ")
+                                .replaceAll("[\\r\\n\\\\\\\\/]+", " ");
+                        if (normalizedText.isEmpty()) {
+                            return;
+                        }
+                        pdf.close();
+                        int bookId = Integer.parseInt(fileName);
+                        Page page = new Page(bookId, pageNumber, normalizedText);
+                        pageDAO.create(page);
+                        pageNumber++;
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    String normalizedText = Normalizer.normalize(text, Normalizer.Form.NFKC)
-                            .replaceAll("\\p{InCombiningDiacriticalMarks}+", " ")
-                            .replaceAll("[\\r\\n\\\\\\\\/]+", " ");
-                    pdf.close();
-                    int bookId = Integer.parseInt(fileName);
-                    newPages.add(new Page(bookId, i, normalizedText));
-                    i++;
-                }
-                PageCollection pageCollection = new PageCollection(newPages);
-                pageCollection.store();
+                });
             }
         } catch (Exception e) {
             e.printStackTrace();
