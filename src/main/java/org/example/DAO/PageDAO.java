@@ -15,7 +15,7 @@ public class PageDAO {
     }
 
     public void create(Page page) throws SQLException {
-        PreparedStatement preparedStatement = dataSource.connection.prepareStatement("INSERT INTO `book_content`(`book_id`,`page_id`,`content`) VALUES(?,?,?)");
+        PreparedStatement preparedStatement = dataSource.connection.prepareStatement("INSERT INTO `book_content`(`id`,`book_id`,`page_id`,`content`) VALUES(NULL,?,?,?)");
         preparedStatement.setInt(1, page.getBookId());
         preparedStatement.setInt(2, page.getNumber());
         preparedStatement.setString(3, page.getContent());
