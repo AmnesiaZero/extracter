@@ -1,7 +1,6 @@
 package org.example.controllers;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.example.DAO.DataSource;
@@ -13,13 +12,11 @@ import org.example.models.Page;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.text.Normalizer;
 import java.util.stream.Stream;
 
 
 public class PageController {
-    public int pageNumber;
     public PageDAO pageDAO;
 
     public DocumentDAO documentDAO;
@@ -49,73 +46,63 @@ public class PageController {
                 errorCount = 0;
                 try (Stream<Path> subDirectoryStream = Files.list(directoryPath)) {
                     subDirectoryStream
-                            .filter(subDirectoryPath ->Integer.parseInt(subDirectoryPath.getFileName().toString())> lastBookId)
+                            .filter(subDirectoryPath -> Integer.parseInt(subDirectoryPath.getFileName().toString()) > lastBookId)
                             .filter(subDirectoryPath -> subDirectoryPath.getFileName().toString().matches("\\d+"))
                             .forEach(subDirectoryPath -> {
-                                try (Stream<Path> subFileStream = Files.list(subDirectoryPath)) {
-                                    subFileStream
-                                            .filter(Files::isRegularFile)
-                                            .filter(file -> file.getFileName().toString().contains(".pdf"))
-                                            .forEach(filePath -> {
-                                                try {
-                                                    loadFile(filePath);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-                                            });
+                                String file = subDirectoryPath.toString() + "/" + subDirectoryPath.getFileName() + ".pdf";
+                                Path filePath = Paths.get(file);
+                                if (!Files.exists(filePath)) {
+                                    return;
+                                }
+                                try {
+                                    loadFile(filePath);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
+
                             });
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 currentDirectory++;
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void loadFile(Path filePath) throws Exception {
-        pageNumber = 1;
         String fileName = filePath.getFileName().toString().replace(".pdf", "");
         int bookId = Integer.parseInt(fileName);
-//        if(FileUtils.sizeOf(filePath.toFile())>100000000){
-//            Document document = new Document(bookId);
-//            documentDAO.create(document);
-//            return;
-//        }
+        if (FileUtils.sizeOf(filePath.toFile()) > 10000000) {
+            Document document = new Document(bookId);
+            documentDAO.create(document);
+            return;
+        }
         try (PDDocument document = PDDocument.load(filePath.toFile())) {
             int totalPages = document.getNumberOfPages();
+            PDFTextStripper textStripper = new PDFTextStripper();
             if (totalPages > 0) {
-                Splitter splitter = new Splitter();
-                 splitter.split(document).forEach(pdf -> {
-                    try {
-                        PDFTextStripper stripper = new PDFTextStripper();
-                        String text = stripper.getText(pdf);
-                        String normalizedText = Normalizer.normalize(text, Normalizer.Form.NFKC)
-                                .replaceAll("\\p{InCombiningDiacriticalMarks}+", " ")
-                                .replaceAll("[\\r\\n\\\\\\\\/]+", " ");
-                        if (normalizedText.isEmpty()) {
-                            return;
-                        }
-                        pdf.close();
-                        Page page = new Page(bookId, pageNumber, normalizedText);
-                        pageDAO.create(page);
-                        pageNumber++;
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                // Разбиваем документ на отдельные страницы и извлекаем текст
+                for (int pageNum = 1; pageNum < totalPages; pageNum++) {
+                    textStripper.setStartPage(pageNum);
+                    textStripper.setEndPage(pageNum);
+                    String pageText = textStripper.getText(document);
+                    String cleanedText = pageText.replaceAll("[^\\p{L}\\p{Nd} ]", "");
+                    cleanedText = Normalizer.normalize(cleanedText, Normalizer.Form.NFD)
+                            .replaceAll("\\p{M}", "");
+                    if (cleanedText.isEmpty()) {
+                        return;
                     }
-                });
+                    Page page = new Page(bookId, pageNum, cleanedText);
+                    pageDAO.create(page);
+                }
             }
         } catch (Exception e) {
             Document document = new Document(bookId);
             documentDAO.create(document);
             e.printStackTrace();
         }
-
     }
 }
 

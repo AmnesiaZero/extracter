@@ -1,6 +1,5 @@
 package org.example.models;
 
-import com.google.gson.Gson;
 import org.example.DAO.DataSource;
 import org.example.DAO.PageDAO;
 
@@ -24,12 +23,7 @@ public class PageCollection {
         this.pages = pages;
     }
 
-    // геттеры и сеттеры
 
-    public String toJson() {
-        Gson gson = new Gson();
-        return gson.toJson(this);
-    }
 
     public void store() throws SQLException {
 

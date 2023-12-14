@@ -1,12 +1,9 @@
 package org.example.DAO;
 
 import org.example.models.Document;
-import org.example.models.Page;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class DocumentDAO {
     public DataSource dataSource;
