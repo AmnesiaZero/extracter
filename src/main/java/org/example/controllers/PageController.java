@@ -22,8 +22,9 @@ public class PageController {
     public DocumentDAO documentDAO;
 
     public PageController() throws Exception {
-        this.pageDAO = new PageDAO(new DataSource());
-        this.documentDAO = new DocumentDAO(new DataSource());
+        DataSource dataSource = new DataSource();
+        this.pageDAO = new PageDAO(dataSource);
+        this.documentDAO = new DocumentDAO(dataSource);
     }
 
     public void split() {
@@ -44,27 +45,22 @@ public class PageController {
                     continue;
                 }
                 errorCount = 0;
-                try (Stream<Path> subDirectoryStream = Files.list(directoryPath)) {
-                    subDirectoryStream
-                            .filter(subDirectoryPath -> Integer.parseInt(subDirectoryPath.getFileName().toString()) > lastBookId)
-                            .filter(subDirectoryPath -> subDirectoryPath.getFileName().toString().matches("\\d+"))
-                            .forEach(subDirectoryPath -> {
-                                String file = subDirectoryPath.toString() + "/" + subDirectoryPath.getFileName() + ".pdf";
-                                Path filePath = Paths.get(file);
-                                if (!Files.exists(filePath)) {
-                                    return;
-                                }
-                                try {
-                                    loadFile(filePath);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-
-                            });
-                } catch (Exception e) {
-                    e.printStackTrace();
+                for(int i = lastBookId;i<currentDirectory*1000;i++){
+                    Path subDirectoryPath = Paths.get(directoryPath + "/" + i);
+                    if (!Files.exists(subDirectoryPath)) {
+                        continue;
+                    }
+                    String file = subDirectoryPath + "/" + subDirectoryPath.getFileName() + ".pdf";
+                    Path filePath = Paths.get(file);
+                    if (!Files.exists(filePath)) {
+                        continue;
+                    }
+                    try {
+                        loadFile(filePath);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-                currentDirectory++;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -74,7 +70,7 @@ public class PageController {
     public void loadFile(Path filePath) throws Exception {
         String fileName = filePath.getFileName().toString().replace(".pdf", "");
         int bookId = Integer.parseInt(fileName);
-        if (FileUtils.sizeOf(filePath.toFile()) > 10000000) {
+        if (FileUtils.sizeOf(filePath.toFile()) > 5000000) {
             Document document = new Document(bookId);
             documentDAO.create(document);
             return;
