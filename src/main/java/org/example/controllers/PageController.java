@@ -34,6 +34,8 @@ public class PageController {
             String sourceDir = "/tmp/drive/ALLPDFS2";
             int currentDirectory = lasDirectory;
             int errorCount = 0;
+            int directoriesCount = 0;
+            int currentBook;
             while (true) {
                 Path directoryPath = Paths.get(sourceDir + "/" + currentDirectory);
                 if (!Files.exists(directoryPath)) {
@@ -45,12 +47,18 @@ public class PageController {
                     continue;
                 }
                 errorCount = 0;
-                for(int i = lastBookId;i<currentDirectory*1000;i++){
+                if(directoriesCount>0){
+                    currentBook = (currentDirectory-1) * 1000;
+                }
+                else {
+                    currentBook = lastBookId;
+                }
+                for(int i = currentBook;i<currentDirectory*1000;i++){
                     Path subDirectoryPath = Paths.get(directoryPath + "/" + i);
                     if (!Files.exists(subDirectoryPath)) {
                         continue;
                     }
-                    String file = subDirectoryPath + "/" + subDirectoryPath.getFileName() + ".pdf";
+                    String file = subDirectoryPath + "/" + i + ".pdf";
                     Path filePath = Paths.get(file);
                     if (!Files.exists(filePath)) {
                         continue;
@@ -61,6 +69,7 @@ public class PageController {
                         e.printStackTrace();
                     }
                 }
+                directoriesCount++;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -70,7 +79,7 @@ public class PageController {
     public void loadFile(Path filePath) throws Exception {
         String fileName = filePath.getFileName().toString().replace(".pdf", "");
         int bookId = Integer.parseInt(fileName);
-        if (FileUtils.sizeOf(filePath.toFile()) > 5000000) {
+        if (FileUtils.sizeOf(filePath.toFile()) > 1042880) {
             Document document = new Document(bookId);
             documentDAO.create(document);
             return;
@@ -94,7 +103,8 @@ public class PageController {
                     pageDAO.create(page);
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Document document = new Document(bookId);
             documentDAO.create(document);
             e.printStackTrace();
